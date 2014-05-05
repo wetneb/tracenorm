@@ -1,5 +1,6 @@
 
 import numpy as np
+import math
 
 def ridge(inputs, outputs, lmbd):
     """Implements ridge regression using the closed formula"""
@@ -41,6 +42,13 @@ def incremental_ridge(inputs, outputs, lmbd, iterations, stepsize):
 
     return A
 
+def frobenius_norm_squared(A):
+    A2 = np.multiply(A,A)
+    return np.real(np.sum(A2))
+
+def fitness(inputs, outputs, A):
+    return frobenius_norm_squared(np.dot(inputs, A) - outputs)
+
 def incremental_tracenorm(inputs, outputs, lmbd, iterations, stepsize):
     """ Implements trace norm regression using the first gradient descent from (Ji and Ye, 2009)"""
     # Computes min_A || inputs * A - outputs ||^2 + lmbd * || A ||*
@@ -74,6 +82,8 @@ def incremental_tracenorm(inputs, outputs, lmbd, iterations, stepsize):
 
     return A
 
-
+def tracenorm(A):
+    U, s, V = np.linalg.svd(A)
+    return sum(s)
 
 
