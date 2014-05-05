@@ -2,3 +2,6 @@
 # Python files
 *.pyc
 
+# Vim files
+*.swp
+
