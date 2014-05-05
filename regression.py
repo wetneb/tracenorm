@@ -1,7 +1,7 @@
 
 import numpy as np
 
-def regression(inputs, outputs, lmbd):
+def ridge(inputs, outputs, lmbd):
     """Implements ridge regression using the closed formula"""
     # Computes min_A || inputs * A - outputs ||^2 + lmbd * || A ||^2
     # Where || A ||^2 = tr (A^t A)
@@ -16,7 +16,7 @@ def regression(inputs, outputs, lmbd):
 
     return A
 
-def incremental(inputs, outputs, lmbd, iterations, stepsize):
+def incremental_ridge(inputs, outputs, lmbd, iterations, stepsize):
     """Implements ridge regression using gradient descent"""
     # Computes min_A || inputs * A - outputs ||^2 + lmbd * || A ||^2
     # Where || A ||^2 = tr (A^t A)
@@ -41,7 +41,7 @@ def incremental(inputs, outputs, lmbd, iterations, stepsize):
 
     return A
 
-def tracenorm(inputs, outputs, lmbd, iterations, stepsize):
+def incremental_tracenorm(inputs, outputs, lmbd, iterations, stepsize):
     """ Implements trace norm regression using the first gradient descent from (Ji and Ye, 2009)"""
     # Computes min_A || inputs * A - outputs ||^2 + lmbd * || A ||*
     # Where || A ||* is the sum of the singular values of A
