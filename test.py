@@ -50,3 +50,16 @@ plt.show()
 plt.plot(costTN)
 plt.show()
 
+print "Result with accelerated gradient descent:"
+res, costATN = regression.accelerated_tracenorm(inputs, outputs, lmbd, iterations, 0.01, 1.2)
+print res
+print_stats(res)
+
+for i in range(len(costATN)):
+    total_cost = costATN[i][0] + costATN[i][1]
+    costATN[i].append(total_cost)
+    costATN[i].append(upperBoundTNCost)
+
+plt.plot(costATN)
+plt.show()
+
