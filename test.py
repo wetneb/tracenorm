@@ -48,32 +48,25 @@ for i in range(len(costATN)):
 # plt.plot(costATN)
 # plt.show()
 
+iterations = 50
+q = np.shape(inputs)[1]
+r = np.shape(outputs)[1]
+initial = np.random.rand(q,r)
+
 print ""
 print "Result with extended gradient descent:"
-res, costRATN = regression.extended_gradient_tracenorm(inputs,outputs,lmbd,1000)
+res, costEGD = regression.extended_gradient_tracenorm(inputs,outputs,lmbd,iterations,initial)
 print res
 print_stats(res)
 
-for i in range(len(costRATN)):
-    total_cost = costRATN[i][0] + costRATN[i][1]
-    costRATN[i].append(total_cost)
-    costRATN[i].append(upperBoundTNCost)
-
-plt.plot(costRATN)
-plt.show()
 
 print ""
 print "Result with accelerated gradient descent:"
-res, costRATN = regression.accelerated_gradient_tracenorm(inputs,outputs,lmbd,1000)
+res, costAGD = regression.accelerated_gradient_tracenorm(inputs,outputs,lmbd,iterations,initial)
 print res
 print_stats(res)
 
-for i in range(len(costRATN)):
-    total_cost = costRATN[i][0] + costRATN[i][1]
-    costRATN[i].append(total_cost)
-    costRATN[i].append(upperBoundTNCost)
-
-plt.plot(costRATN)
+plt.plot(np.array([costEGD, costAGD]).transpose())
 plt.show()
 
 

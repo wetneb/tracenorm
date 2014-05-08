@@ -160,7 +160,7 @@ def gradient_tracenorm(inputs, outputs, lmbd, iterations):
 
     return A, costs
 
-def extended_gradient_tracenorm(inputs, outputs, lmbd, iterations):
+def extended_gradient_tracenorm(inputs, outputs, lmbd, iterations, initial=0):
     # Epsilon is here to ensure that the Lipschitz constant is big enough
     # (because the expression of L is tight)
     epsilon = 0.05
@@ -171,14 +171,17 @@ def extended_gradient_tracenorm(inputs, outputs, lmbd, iterations):
     p = np.shape(inputs)[0]
     q = np.shape(inputs)[1]
     r = np.shape(outputs)[1]
-    A = np.random.rand(q,r)
+    if type(initial) == int:
+        A = np.random.rand(q,r)
+    else:
+        A = initial
 
     costs = []
 
     for i in range(iterations):
         # Cost tracking
-        costs.append([fitness(inputs, outputs, A),
-                      lmbd* tracenorm(A)])
+        costs.append(fitness(inputs, outputs, A) +
+                      lmbd* tracenorm(A))
 
         next_A = next_tracenorm_guess(inputs, outputs, lmbd, L, A)
 
@@ -196,7 +199,7 @@ def extended_gradient_tracenorm(inputs, outputs, lmbd, iterations):
     print "Bound on L: "+str(L_bound)
     return A, costs
 
-def accelerated_gradient_tracenorm(inputs, outputs, lmbd, iterations):
+def accelerated_gradient_tracenorm(inputs, outputs, lmbd, iterations, initial=0):
     L = 1
     gamma = 1.5
     alpha = 1
@@ -207,15 +210,18 @@ def accelerated_gradient_tracenorm(inputs, outputs, lmbd, iterations):
     p = np.shape(inputs)[0]
     q = np.shape(inputs)[1]
     r = np.shape(outputs)[1]
-    W = np.random.rand(q,r)
+    if type(initial) == int:
+        W = np.random.rand(q,r)
+    else:
+        W = initial
     Z = W
 
     costs = []
 
     for i in range(iterations):
         # Cost tracking
-        costs.append([fitness(inputs, outputs, W),
-                      lmbd* tracenorm(W)])
+        costs.append(fitness(inputs, outputs, W)+
+                      lmbd* tracenorm(W))
 
         next_W = next_tracenorm_guess(inputs, outputs, lmbd, L, Z)
 
