@@ -36,7 +36,7 @@ for i in range(len(costIR)):
 print ""
 
 print "Result with gradient descent trace norm regression:"
-res, costTN = regression.incremental_tracenorm(inputs, outputs, lmbd, iterations, 0.001)
+res, costTN = regression.incremental_tracenorm(inputs, outputs, lmbd, iterations, 1000)
 print res
 print_stats(res)
 
@@ -45,13 +45,13 @@ for i in range(len(costTN)):
     costTN[i].append(total_cost)
     costTN[i].append(upperBoundTNCost)
 
-plt.plot(costIR)
-plt.show()
-plt.plot(costTN)
-plt.show()
+#plt.plot(costIR)
+#plt.show()
+#plt.plot(costTN)
+#plt.show()
 
 print "Result with accelerated gradient descent:"
-res, costATN = regression.accelerated_tracenorm(inputs, outputs, lmbd, iterations, 0.01, 1.2)
+res, costATN = regression.accelerated_tracenorm(inputs, outputs, lmbd, 200, 1, 1.2)
 print res
 print_stats(res)
 
