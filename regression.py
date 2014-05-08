@@ -196,3 +196,45 @@ def extended_gradient_tracenorm(inputs, outputs, lmbd, iterations):
     print "Bound on L: "+str(L_bound)
     return A, costs
 
+def accelerated_gradient_tracenorm(inputs, outputs, lmbd, iterations):
+    L = 1
+    gamma = 1.5
+    alpha = 1
+
+    epsilon = 0.1
+    L_bound = (1+epsilon)*2*math.sqrt(frobenius_norm_squared(np.dot(inputs.transpose(), inputs)))
+
+    p = np.shape(inputs)[0]
+    q = np.shape(inputs)[1]
+    r = np.shape(outputs)[1]
+    W = np.random.rand(q,r)
+    Z = W
+
+    costs = []
+
+    for i in range(iterations):
+        # Cost tracking
+        costs.append([fitness(inputs, outputs, W),
+                      lmbd* tracenorm(W)])
+
+        next_W = next_tracenorm_guess(inputs, outputs, lmbd, L, Z)
+
+        while(fitness(inputs, outputs, next_W) > intermediate_cost(inputs, outputs, next_W, Z, L)):
+            if L > L_bound:
+                print "Numerical error detected at iteration "+str(i)
+                break
+
+            L = gamma * L
+            next_W = next_tracenorm_guess(inputs, outputs, lmbd, L, Z)
+
+        previous_W = W
+        W = next_W
+        previous_alpha = alpha
+        alpha = (1 + math.sqrt(1 + 4*alpha*alpha))/2
+        Z = W + ((alpha - 1)/alpha)*(W - previous_W)
+
+    print "Final L: "+str(L)
+    print "Bound on L: "+str(L_bound)
+    return W, costs
+
+
