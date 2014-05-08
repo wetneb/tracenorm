@@ -136,7 +136,7 @@ def accelerated_tracenorm(inputs, outputs, lmbd, iterations):
     # (because the expression of L is tight)
     epsilon = 0.05
     L = (1+epsilon)*2*math.sqrt(frobenius_norm_squared(np.dot(inputs.transpose(), inputs)))
-    print "New L: "+str(L)
+    print "Computed L: "+str(L)
 
     p = np.shape(inputs)[0]
     q = np.shape(inputs)[1]
@@ -158,5 +158,41 @@ def accelerated_tracenorm(inputs, outputs, lmbd, iterations):
        
         A = next_A
 
+    return A, costs
+
+def really_accelerated_tracenorm(inputs, outputs, lmbd, iterations):
+    # Epsilon is here to ensure that the Lipschitz constant is big enough
+    # (because the expression of L is tight)
+    epsilon = 0.05
+    L_bound = (1+epsilon)*2*math.sqrt(frobenius_norm_squared(np.dot(inputs.transpose(), inputs)))
+    L = 1
+    gamma = 1.5
+
+    p = np.shape(inputs)[0]
+    q = np.shape(inputs)[1]
+    r = np.shape(outputs)[1]
+    A = np.random.rand(q,r)
+
+    costs = []
+
+    for i in range(iterations):
+        # Cost tracking
+        costs.append([fitness(inputs, outputs, A),
+                      lmbd* tracenorm(A)])
+
+        next_A = next_tracenorm_guess(inputs, outputs, lmbd, L, A)
+
+        while(fitness(inputs, outputs, next_A) > intermediate_cost(inputs, outputs, next_A, A, L)):
+            if L > L_bound:
+                print "Numerical error detected at iteration "+str(i)
+                break
+
+            L = gamma * L
+            next_A = next_tracenorm_guess(inputs, outputs, lmbd, L, A)
+       
+        A = next_A
+
+    print "Final L: "+str(L)
+    print "Bound on L: "+str(L_bound)
     return A, costs
 
