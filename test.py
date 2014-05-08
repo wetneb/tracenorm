@@ -47,11 +47,11 @@ for i in range(len(costTN)):
 
 #plt.plot(costIR)
 #plt.show()
-#plt.plot(costTN)
-#plt.show()
+plt.plot(costTN)
+plt.show()
 
 print "Result with accelerated gradient descent:"
-res, costATN = regression.accelerated_tracenorm(inputs, outputs, lmbd, 200, 1, 1.2)
+res, costATN = regression.accelerated_tracenorm(inputs, outputs, lmbd, 1000)
 print res
 print_stats(res)
 

@@ -120,21 +120,22 @@ def costfunction_tracenorm(inputs, outputs, A, lmbd):
 def fitness_gradient(inputs, outputs, A):
     return 2* (np.dot(inputs.transpose(), np.dot(inputs,A)) - np.dot(inputs.transpose(), outputs))
 
-def intermediate_cost(inputs, outputs, new_A, old_A, lmbd, mu):
+# This quantity is the "P_mu" from the article
+def intermediate_cost(inputs, outputs, new_A, old_A, mu):
     diff_A = new_A - old_A
     grad_f = fitness_gradient(inputs, outputs, old_A)
     return (fitness(inputs, outputs, old_A) +
             np.trace(np.dot(diff_A.transpose(), grad_f)) +
-            (mu/2)*frobenius_norm_squared(diff_A) +
-            (tracenorm(new_A)))
+            (mu/2)*frobenius_norm_squared(diff_A))
 
 def frobenius_norm(A):
     return math.sqrt(frobenius_norm_squared(A))
 
-def accelerated_tracenorm(inputs, outputs, lmbd, iterations, L0, gamma):
-    L = L0
-
-    L = 4*math.sqrt(frobenius_norm_squared(np.dot(inputs.transpose(), inputs)))
+def accelerated_tracenorm(inputs, outputs, lmbd, iterations):
+    # Epsilon is here to ensure that the Lipschitz constant is big enough
+    # (because the expression of L is tight)
+    epsilon = 0.05
+    L = (1+epsilon)*2*math.sqrt(frobenius_norm_squared(np.dot(inputs.transpose(), inputs)))
     print "New L: "+str(L)
 
     p = np.shape(inputs)[0]
@@ -145,84 +146,17 @@ def accelerated_tracenorm(inputs, outputs, lmbd, iterations, L0, gamma):
     costs = []
 
     for i in range(iterations):
-        debugging = True #i == 1 or i == 100
-        if debugging:
-            print "Iteration "+str(i)
-            print "A = "
-            print A
-
         # Cost tracking
         costs.append([fitness(inputs, outputs, A),
                       lmbd* tracenorm(A)])
 
-        if debugging:
-            print "Fitness: "+str(fitness(inputs, outputs, A))
-            print "Tracenorm: "+str(tracenorm(A))
-
         next_A = next_tracenorm_guess(inputs, outputs, lmbd, L, A)
-        if debugging:
-            print "Current L: "+str(L)
-            print "Next_A: "
-            print next_A
-            print "costfunction_tracenorm on next_A: "+str(costfunction_tracenorm(inputs, outputs, next_A, lmbd))
-            print "intermediate_cost: "+str(intermediate_cost(inputs, outputs, next_A, A, lmbd, L))
-        if (costfunction_tracenorm(inputs, outputs, next_A, lmbd) > intermediate_cost(inputs, outputs, next_A, A, lmbd, L)):
+
+        if(fitness(inputs, outputs, next_A) > intermediate_cost(inputs, outputs, next_A, A, L)):
             print "Numerical error detected."
-            print "Diagnosis:"
-            print "1/ Cost function:"
-            print "- Fitness on next_A: "+str(fitness(inputs, outputs, next_A))
-            print "- Trace Norm of next_A: "+str(tracenorm(next_A))
-            print "- Lambda: "+str(lmbd)
-            print "TOTAL: "+str(costfunction_tracenorm(inputs, outputs, next_A, lmbd))
-            print "2/ Q_L:"
-            print "- fitness of old_A: "+str(fitness(inputs, outputs, A))
-            gradient = 2*(np.dot(inputs.transpose(), np.dot(inputs, A)) - np.dot(inputs.transpose(), outputs))
-            print "- gradient"
-            print gradient
-            print "- first-order term: "+str(np.trace(np.dot(next_A.transpose() - A.transpose(), gradient)))
-            print "- difference between next_A and A: "
-            print (next_A - A)
-            print "- quadratic term: "+str((L/2)*frobenius_norm_squared(A - next_A))
-            print "- Trace Norm of next_A: "+str(tracenorm(next_A))
-            print "TOTAL: "+str(intermediate_cost(inputs, outputs, next_A, A, lmbd, L))
-            print "Lipschitz check:"
-            diffgrad = fitness_gradient(inputs,outputs,next_A) - fitness_gradient(inputs,outputs,A)
-            print "Difference between gradients (norm): "+str(frobenius_norm(diffgrad))
-            print "Difference between A and next_A: "+str(frobenius_norm(A - next_A))
-            print "Difference between A and next_A times L: "+str(L*(frobenius_norm(A - next_A)))
-
-            t = np.linspace(-0.2,1.2)
-            At = []
-            fitness_t = []
-            grad_t = []
-            fa = fitness(inputs,outputs,A)
-            grad_fa = np.trace(np.dot(fitness_gradient(inputs,outputs,A).transpose(), next_A - A))
-            n2diff = frobenius_norm_squared(A - next_A)
-            for ti in t:
-                point = A + ti*(next_A - A)
-                At.append(point)
-                fitness_t.append([fitness(inputs,outputs,point), fa + ti*grad_fa, fa+ti*grad_fa + (L/2)*ti*ti*n2diff])
-
-            At = np.array(At)
-            fitness_t = np.array(fitness_t)
-            grad_t = np.array(grad_t)
-            fitness_t
-            plt.plot(t, fitness_t)
-            plt.show()
-            
             break
-#                 L = gamma*L
-#                 if debugging:
-#                     print "Current L: "+str(L)
-#                     print "Next_A: "
-#                     print next_A
-#                     print "costfunction_tracenorm on next_A: "+str(costfunction_tracenorm(inputs, outputs, next_A, lmbd))
-#                     print "intermediate_cost: "+str(intermediate_cost(inputs, outputs, next_A, A, lmbd, L))
-#                 next_A = next_tracenorm_guess(inputs, outputs, lmbd, L, A)
-        
+       
         A = next_A
-        if debugging:
-            print "\n"
 
     return A, costs
 
