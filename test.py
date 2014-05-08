@@ -36,7 +36,7 @@ for i in range(len(costIR)):
 print ""
 
 print "Result with accelerated gradient descent:"
-res, costATN = regression.accelerated_tracenorm(inputs, outputs, lmbd, 1000)
+res, costATN = regression.gradient_tracenorm(inputs, outputs, lmbd, 1000)
 print res
 print_stats(res)
 
@@ -50,7 +50,7 @@ plt.show()
 
 print ""
 print "Result with really accelerated gradient descent:"
-res, costRATN = regression.really_accelerated_tracenorm(inputs,outputs,lmbd,1000)
+res, costRATN = regression.extended_gradient_tracenorm(inputs,outputs,lmbd,1000)
 print res
 print_stats(res)
 

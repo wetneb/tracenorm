@@ -131,7 +131,7 @@ def intermediate_cost(inputs, outputs, new_A, old_A, mu):
 def frobenius_norm(A):
     return math.sqrt(frobenius_norm_squared(A))
 
-def accelerated_tracenorm(inputs, outputs, lmbd, iterations):
+def gradient_tracenorm(inputs, outputs, lmbd, iterations):
     # Epsilon is here to ensure that the Lipschitz constant is big enough
     # (because the expression of L is tight)
     epsilon = 0.05
@@ -160,7 +160,7 @@ def accelerated_tracenorm(inputs, outputs, lmbd, iterations):
 
     return A, costs
 
-def really_accelerated_tracenorm(inputs, outputs, lmbd, iterations):
+def extended_gradient_tracenorm(inputs, outputs, lmbd, iterations):
     # Epsilon is here to ensure that the Lipschitz constant is big enough
     # (because the expression of L is tight)
     epsilon = 0.05
