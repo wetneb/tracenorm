@@ -5,3 +5,6 @@
 # Vim files
 *.swp
 
+# External tools
+NNLS-0
+
