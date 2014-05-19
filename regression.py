@@ -76,7 +76,7 @@ def next_tracenorm_guess(inputs, outputs, lmbd, mu, current_A):
     C = A - (1/mu) * gradient
     U, s, V = np.linalg.svd(C)
 
-    s = s - (lmbd/2)*np.ones(np.shape(s)[0])
+    s = s - (lmbd/(2*mu))*np.ones(np.shape(s)[0])
     sz = np.array([s, np.zeros(np.shape(s)[0])])
     final_s = sz.max(0)
     lu = np.shape(U)[1]
